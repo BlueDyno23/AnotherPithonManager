@@ -1,6 +1,7 @@
 ﻿using AnotherPithonManager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnotherPithonManager.Pages
 {
@@ -63,8 +64,8 @@ namespace AnotherPithonManager.Pages
             {
                 if(_context.Users.Where(u => u.UserEmail == NewUser.UserEmail).First().UserPassword == NewUser.UserPassword)
                 {
-                    int id = _context.Users.Where(u => u.UserEmail == NewUser.UserEmail).First().Id;
-                    HttpContext.Session.SetInt32("Id", id);
+                    int id = _context.Users.First(u => u.UserEmail == NewUser.UserEmail).Id;
+                    HttpContext.Session.SetInt32("id", id);
                     HttpContext.Session.SetString("logged", "true");
                     return Redirect("Home");
                 }
