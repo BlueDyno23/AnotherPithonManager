@@ -1,0 +1,61 @@
+﻿@page
+@using AnotherPithonManager.Models;
+@model HomeModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">ברוכים הבאים</h1>
+    <p>מה עושים היום?</p>
+    <div>
+        <a asp-page="Volunteers" class="btn btn-light fs-3">מתנדבים</a>
+        <a class="btn btn-light fs-2">תשלומים</a>
+    </div>
+    <form class="container-sm mt-5 w-25" method="get">
+        <input type="number" class="form-control" placeholder="תעודת זהות"/>
+        <button type="submit" asp-page-handler="QuickSearch" class="form-control btn btn-primary mt-1">חיפוש מהיר</button>
+    </form>
+    @if (ViewData["MatchingRows"] != null)
+    {
+        var matchingRows = ViewData["MatchingRows"] as List<Volunteer>;
+
+        <h2>@matchingRows[0].Name</h2>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>תעודת זהות</th>
+                    <th>שם מלא</th>
+                    <th>שעת כניסה</th>
+                    <th>שעת יציאה</th>
+                    <th>תאריך</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in matchingRows)
+                {
+                    <tr>
+                        <td>@row.Id</td>
+                        <td>@row.Name</td>
+                        <td>@row.Entry</td>
+                        <td>@row.Name</td>
+                        <td>@row.Exit</td>
+                        <td>@row.Date</td>
+                    </tr>
+                }
+            </tbody>
+            @{
+                int h = 0;
+                foreach(var row in matchingRows)
+                {
+                    TimeSpan span = DateTime.Parse(row.Exit).Subtract(DateTime.Parse(row.Entry));
+                    h += span.Hours;
+                }
+                <p>סכום שעות: @h</p>
+            }
+        </table>
+    }
+    <a asp-page-handler="ExportToExcel" class="btn btn-primary mt-5">ייצוא נתונים לגיליון</a>
+    <a asp-page-handler="Logout" class="btn btn-outline-danger mt-5">התנתקות</a>
+</div>

@@ -1,0 +1,18 @@
+﻿@page
+@using AnotherPithonManager.Models;
+@model AnotherPithonManager.Pages.IndexModel
+@{
+    ViewData["Title"] = "Login page";
+
+    <form class="container-sm w-50" method="post">
+        <label class="form-label" for="email">אימייל</label>
+        <input class="form-control" type="email" name="UserEmail" id="email" required>
+        <label class="form-label" for="pass">סיסמה</label>
+        <input class="form-control" type="password" name="UserPassword" id="pass" required>
+
+        <div class="d-flex justify-content-sm-around p-5">
+            <button asp-page-handler="Login" type="submit" class="btn btn-outline-primary">התחברות</button>
+            <button asp-page-handler="Register" type="submit" class="btn btn-outline-primary">הרשמה</button>
+        </div>
+    </form>
+}
