@@ -49,7 +49,19 @@ namespace AnotherPithonManager.Pages
             return Page();
         }
 
+        public IActionResult OnPostDeleteRecord()
+        {
+            int id = int.Parse(Request.Form["id"]);
+            var userId = (int)HttpContext.Session.GetInt32("id");
+            var user = _context.Users.Where(u => u.Id == userId)
+                .Include(u => u.Volunteers)
+                .FirstOrDefault();
 
+            user.Volunteers.RemoveAll(v => v.dId == id);
+            Volunteers = user.Volunteers;
+            _context.SaveChanges();
+            return Page();
+        }
         public IActionResult OnGetExportToExcel()
         {
             List<Volunteer> volunteers = _context.Users.FirstOrDefault(u => u.Id == HttpContext.Session.GetInt32("id")).Volunteers;
