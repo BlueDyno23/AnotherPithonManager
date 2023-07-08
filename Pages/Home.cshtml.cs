@@ -1,6 +1,7 @@
 ﻿using AnotherPithonManager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OfficeOpenXml;
 using System.Transactions;
@@ -23,7 +24,7 @@ namespace AnotherPithonManager.Pages
             {
                 Redirect("Index");
             }
-            currentUser = _context.Users.Where(u => u.Id == HttpContext.Session.GetInt32("id")).First();
+            currentUser = _context.Users.Where(u => u.Id == HttpContext.Session.GetInt32("id")).Include(u => u.Volunteers).First();
         }
 
         public IActionResult OnGetLogout()
@@ -74,7 +75,12 @@ namespace AnotherPithonManager.Pages
         }
         public IActionResult OnGetExportToExcel()
         {
-            List<Volunteer> volunteers = currentUser.Volunteers.ToList();
+            int userId = (int)HttpContext.Session.GetInt32("id");
+            var user = _context.Users.Where(u => u.Id == userId)
+                .Include(u => u.Volunteers)
+                .FirstOrDefault();
+            //Volunteers = _context.Users.FirstOrDefault(u => u.Id == userId).Volunteers;
+            List<Volunteer> Volunteers = user.Volunteers;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (ExcelPackage package = new ExcelPackage())
             {
@@ -86,13 +92,13 @@ namespace AnotherPithonManager.Pages
                 worksheet.Cells[1, 4].Value = "שעת יציאה";
                 worksheet.Cells[1, 5].Value = "תאריך";
 
-                for (int i = 0; i < volunteers.Count; i++)
+                for (int i = 0; i < Volunteers.Count; i++)
                 {
-                    worksheet.Cells[i + 2, 1].Value = volunteers[i].Id;
-                    worksheet.Cells[i + 2, 2].Value = volunteers[i].Name;
-                    worksheet.Cells[i + 2, 3].Value = volunteers[i].Entry;
-                    worksheet.Cells[i + 2, 4].Value = volunteers[i].Exit;
-                    worksheet.Cells[i + 2, 5].Value = volunteers[i].Date;
+                    worksheet.Cells[i + 2, 1].Value = Volunteers[i].Id;
+                    worksheet.Cells[i + 2, 2].Value = Volunteers[i].Name;
+                    worksheet.Cells[i + 2, 3].Value = Volunteers[i].Entry;
+                    worksheet.Cells[i + 2, 4].Value = Volunteers[i].Exit;
+                    worksheet.Cells[i + 2, 5].Value = Volunteers[i].Date;
                 }
 
                 worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
